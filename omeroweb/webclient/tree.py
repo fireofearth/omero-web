@@ -544,6 +544,13 @@ def _marshal_image_deleted(conn, image_id):
         'deleted': True
     }
 
+# HACK 
+def _remove_macro_label_images(images):
+    for image in images:
+        print(image['name'])
+    return list(filter(
+            lambda image: not ('[label image]' in image['name'] or \
+            '[macro image]' in image['name']), images))
 
 def marshal_images(conn, dataset_id=None, orphaned=False, share_id=None,
                    load_pixels=False, group_id=-1, experimenter_id=-1,
@@ -716,6 +723,9 @@ def marshal_images(conn, dataset_id=None, orphaned=False, share_id=None,
             kwargs['share_id'] = share_id
 
         images.append(_marshal_image(**kwargs))
+    
+    ## HACK to remote extra images ##
+    images = _remove_macro_label_images(images)
 
     # Load thumbnails separately
     # We want version of most recent thumbnail (max thumbId) owned by user
